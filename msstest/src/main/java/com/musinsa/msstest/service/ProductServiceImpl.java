@@ -6,10 +6,12 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.musinsa.msstest.dto.CreateProductRequestDto;
 import com.musinsa.msstest.dto.MinAndMaxPriceProductResponseDto;
 import com.musinsa.msstest.dto.MinimumPriceCombinationResponseDto;
 import com.musinsa.msstest.dto.PriceAndBrandResponseDto;
 import com.musinsa.msstest.dto.ProductResponseDto;
+import com.musinsa.msstest.dto.UpdateProductRequestDto;
 import com.musinsa.msstest.entity.ProductEntity;
 import com.musinsa.msstest.repository.ProductRepository;
 
@@ -82,6 +84,32 @@ public class ProductServiceImpl implements ProductService {
 		return MinAndMaxPriceProductResponseDto.of(minimumProduct.getBrand(), minimumProduct.getPrice(),
 				maximumProduct.getBrand(), maximumProduct.getPrice());
 
+	}
+
+	@Override
+	public ProductEntity createProduct(CreateProductRequestDto createProductRequestDto) {
+		ProductEntity productEntity = ProductEntity.from(createProductRequestDto);
+		return productRepository.save(productEntity);
+	}
+
+	@Override
+	public ProductEntity updateProduct(UpdateProductRequestDto updateProductRequestDto) {
+		if (updateProductRequestDto.getId() == null) {
+			throw new RuntimeException("수정 하기 위해 상품 ID는 필수 값입니다.");
+		}
+
+		productRepository.findById(updateProductRequestDto.getId())
+				.orElseThrow(() -> new RuntimeException("해당 상품은 존재하지 않습니다."));
+
+		ProductEntity productEntity = ProductEntity.from(updateProductRequestDto);
+		return productRepository.save(productEntity);
+	}
+
+	@Override
+	public Long deleteProduct(Long id) {
+		productRepository.findById(id).orElseThrow(() -> new RuntimeException("해당 상품은 존재하지 않습니다."));
+		productRepository.deleteById(id);
+		return id;
 	}
 
 }
