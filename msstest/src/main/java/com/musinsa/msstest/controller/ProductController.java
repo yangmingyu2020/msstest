@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.musinsa.msstest.dto.MinimumPriceCombinationResponseDto;
+import com.musinsa.msstest.dto.PriceAndBrandResponseDto;
 import com.musinsa.msstest.service.ProductService;
 
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,11 @@ public class ProductController {
 	@GetMapping("/all/minimum")
 	public ResponseEntity<MinimumPriceCombinationResponseDto> getAllCategoryMinimumPrice() {
 		return ResponseEntity.ok(productService.getAllCategoryMinimumPrice());
+	}
+
+	@GetMapping("all/minimum/brand")
+	public ResponseEntity<PriceAndBrandResponseDto> getAllCategoryMinimumPriceByBrand() {
+		return ResponseEntity.ok(productService.getAllCategoryMinimumPriceByBrand());
 	}
 
 }
