@@ -1,15 +1,9 @@
 package com.musinsa.msstest.service;
 
-import org.springframework.stereotype.Service;
+import com.musinsa.msstest.dto.MinimumPriceCombinationResponseDto;
 
-import com.musinsa.msstest.repository.ProductRepository;
+public interface ProductService {
 
-import lombok.RequiredArgsConstructor;
-
-@Service
-@RequiredArgsConstructor
-public class ProductService {
-
-	private final ProductRepository productRepository;
+	public MinimumPriceCombinationResponseDto getAllCategoryMinimumPrice();
 
 }

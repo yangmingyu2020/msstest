@@ -29,4 +29,8 @@ public class ProductEntity {
 	@Column
 	private Long price;
 
+	public int priceDiff(final ProductEntity other) {
+		return (int) (price - other.price);
+	}
+
 }
