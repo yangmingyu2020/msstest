@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.musinsa.msstest.dto.MinAndMaxPriceProductResponseDto;
 import com.musinsa.msstest.dto.MinimumPriceCombinationResponseDto;
 import com.musinsa.msstest.dto.PriceAndBrandResponseDto;
 import com.musinsa.msstest.dto.ProductResponseDto;
@@ -61,6 +62,26 @@ public class ProductServiceImpl implements ProductService {
 		}
 
 		return priceAndBrandResponseDtos.stream().min(PriceAndBrandResponseDto::totalPriceDiff).get();
+	}
+
+	@Override
+	public MinAndMaxPriceProductResponseDto getMinAndMaxPriceByCategory(String category) {
+
+		List<String> categories = productRepository.findDistinctCategory();
+
+		if (!categories.contains(category)) {
+			throw new RuntimeException("해당 카테고리는 존재하지 않습니다.");
+		}
+
+		List<ProductEntity> productEntities = productRepository.findByCategory(category);
+
+		ProductEntity minimumProduct = productEntities.stream().min(ProductEntity::priceDiff).get();
+
+		ProductEntity maximumProduct = productEntities.stream().max(ProductEntity::priceDiff).get();
+
+		return MinAndMaxPriceProductResponseDto.of(minimumProduct.getBrand(), minimumProduct.getPrice(),
+				maximumProduct.getBrand(), maximumProduct.getPrice());
+
 	}
 
 }
