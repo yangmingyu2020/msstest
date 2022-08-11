@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.musinsa.msstest.dto.CreateProductRequestDto;
@@ -13,6 +14,7 @@ import com.musinsa.msstest.dto.PriceAndBrandResponseDto;
 import com.musinsa.msstest.dto.ProductResponseDto;
 import com.musinsa.msstest.dto.UpdateProductRequestDto;
 import com.musinsa.msstest.entity.ProductEntity;
+import com.musinsa.msstest.exception.ProductException;
 import com.musinsa.msstest.repository.ProductRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -72,7 +74,7 @@ public class ProductServiceImpl implements ProductService {
 		List<String> categories = productRepository.findDistinctCategory();
 
 		if (!categories.contains(category)) {
-			throw new RuntimeException("해당 카테고리는 존재하지 않습니다.");
+			throw new ProductException("해당 카테고리는 존재하지 않습니다.", HttpStatus.NOT_FOUND);
 		}
 
 		List<ProductEntity> productEntities = productRepository.findByCategory(category);
@@ -95,11 +97,11 @@ public class ProductServiceImpl implements ProductService {
 	@Override
 	public ProductEntity updateProduct(UpdateProductRequestDto updateProductRequestDto) {
 		if (updateProductRequestDto.getId() == null) {
-			throw new RuntimeException("수정 하기 위해 상품 ID는 필수 값입니다.");
+			throw new ProductException("수정 하기 위해 상품 ID는 필수 값입니다.", HttpStatus.CONFLICT);
 		}
 
 		productRepository.findById(updateProductRequestDto.getId())
-				.orElseThrow(() -> new RuntimeException("해당 상품은 존재하지 않습니다."));
+				.orElseThrow(() -> new ProductException("해당 상품은 존재하지 않습니다.", HttpStatus.NOT_FOUND));
 
 		ProductEntity productEntity = ProductEntity.from(updateProductRequestDto);
 		return productRepository.save(productEntity);
@@ -107,7 +109,8 @@ public class ProductServiceImpl implements ProductService {
 
 	@Override
 	public Long deleteProduct(Long id) {
-		productRepository.findById(id).orElseThrow(() -> new RuntimeException("해당 상품은 존재하지 않습니다."));
+		productRepository.findById(id)
+				.orElseThrow(() -> new ProductException("해당 상품은 존재하지 않습니다.", HttpStatus.NOT_FOUND));
 		productRepository.deleteById(id);
 		return id;
 	}
