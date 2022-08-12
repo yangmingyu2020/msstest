@@ -2,6 +2,7 @@ package com.musinsa.msstest.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -90,6 +91,15 @@ public class ProductServiceImpl implements ProductService {
 
 	@Override
 	public ProductEntity createProduct(CreateProductRequestDto createProductRequestDto) {
+		if (createProductRequestDto.getBrand() == null || createProductRequestDto.getPrice() == null
+				|| createProductRequestDto.getCategory() == null) {
+			throw new ProductException("상품의 정보 값이 비어있습니다.", HttpStatus.BAD_REQUEST);
+		}
+		
+		if(createProductRequestDto.getPrice() < 0) {
+			throw new ProductException("상품의 가격이 0 미만입니다.", HttpStatus.BAD_REQUEST);
+		}
+
 		ProductEntity productEntity = ProductEntity.from(createProductRequestDto);
 		return productRepository.save(productEntity);
 	}

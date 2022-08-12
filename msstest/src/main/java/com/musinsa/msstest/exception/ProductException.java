@@ -8,6 +8,15 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public class ProductException extends RuntimeException {
-	private String message;
 	private HttpStatus httpStatus;
+
+	public ProductException(String message) {
+		super(message);
+	}
+
+	public ProductException(String message, HttpStatus httpStatus) {
+		super(message);
+		this.httpStatus = httpStatus;
+	}
+
 }
