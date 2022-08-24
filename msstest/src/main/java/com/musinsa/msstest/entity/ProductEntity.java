@@ -2,6 +2,8 @@ package com.musinsa.msstest.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -11,6 +13,7 @@ import com.musinsa.msstest.dto.CreateProductRequestDto;
 import com.musinsa.msstest.dto.UpdateProductRequestDto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,6 +21,7 @@ import lombok.Setter;
 @Table(name = "product")
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 public class ProductEntity {
 
@@ -26,7 +30,8 @@ public class ProductEntity {
 	private Long id;
 
 	@Column
-	private String category;
+	@Enumerated(EnumType.STRING)
+	private Category category;
 
 	@Column
 	private String brand;
@@ -41,7 +46,7 @@ public class ProductEntity {
 	public ProductEntity() {
 	}
 
-	public ProductEntity(String category, String brand, Long price) {
+	public ProductEntity(Category category, String brand, Long price) {
 		this.category = category;
 		this.brand = brand;
 		this.price = price;

@@ -2,11 +2,10 @@ package com.musinsa.msstest.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.musinsa.msstest.dto.CreateProductRequestDto;
 import com.musinsa.msstest.dto.MinAndMaxPriceProductResponseDto;
@@ -14,6 +13,7 @@ import com.musinsa.msstest.dto.MinimumPriceCombinationResponseDto;
 import com.musinsa.msstest.dto.PriceAndBrandResponseDto;
 import com.musinsa.msstest.dto.ProductResponseDto;
 import com.musinsa.msstest.dto.UpdateProductRequestDto;
+import com.musinsa.msstest.entity.Category;
 import com.musinsa.msstest.entity.ProductEntity;
 import com.musinsa.msstest.exception.ProductException;
 import com.musinsa.msstest.repository.ProductRepository;
@@ -22,19 +22,18 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ProductServiceImpl implements ProductService {
 
-	@Autowired
 	private final ProductRepository productRepository;
 
 	@Override
 	public MinimumPriceCombinationResponseDto getAllCategoryMinimumPrice() {
 
-		List<String> categories = productRepository.findDistinctCategory();
 		List<ProductResponseDto> productEntities = new ArrayList<>();
 		Long totalPrice = 0L;
 
-		for (String category : categories) {
+		for (Category category : Category.values()) {
 			List<ProductEntity> productEntityList = productRepository.findByCategory(category);
 
 			ProductEntity minimumProduct = productEntityList.stream().min(ProductEntity::priceDiff).get();
@@ -50,13 +49,12 @@ public class ProductServiceImpl implements ProductService {
 	@Override
 	public PriceAndBrandResponseDto getAllCategoryMinimumPriceByBrand() {
 
-		List<String> categories = productRepository.findDistinctCategory();
 		List<String> brands = productRepository.findDistinctBrand();
 		List<PriceAndBrandResponseDto> priceAndBrandResponseDtos = new ArrayList<>();
 
 		for (String brand : brands) {
 			Long totalPrice = 0L;
-			for (String category : categories) {
+			for (Category category : Category.values()) {
 				List<ProductEntity> productEntities = productRepository.findByBrandAndCategory(brand, category);
 
 				ProductEntity minimumProduct = productEntities.stream().min(ProductEntity::priceDiff).get();
@@ -72,13 +70,19 @@ public class ProductServiceImpl implements ProductService {
 	@Override
 	public MinAndMaxPriceProductResponseDto getMinAndMaxPriceByCategory(String category) {
 
-		List<String> categories = productRepository.findDistinctCategory();
+		Category categoryEnum = null;
 
-		if (!categories.contains(category)) {
+		for (Category category1 : Category.values()) {
+			if (category1.toString().equals(category)) {
+				categoryEnum = category1;
+			}
+		}
+
+		if (categoryEnum == null) {
 			throw new ProductException("해당 카테고리는 존재하지 않습니다.", HttpStatus.NOT_FOUND);
 		}
 
-		List<ProductEntity> productEntities = productRepository.findByCategory(category);
+		List<ProductEntity> productEntities = productRepository.findByCategory(categoryEnum);
 
 		ProductEntity minimumProduct = productEntities.stream().min(ProductEntity::priceDiff).get();
 
@@ -95,8 +99,8 @@ public class ProductServiceImpl implements ProductService {
 				|| createProductRequestDto.getCategory() == null) {
 			throw new ProductException("상품의 정보 값이 비어있습니다.", HttpStatus.BAD_REQUEST);
 		}
-		
-		if(createProductRequestDto.getPrice() < 0) {
+
+		if (createProductRequestDto.getPrice() < 0) {
 			throw new ProductException("상품의 가격이 0 미만입니다.", HttpStatus.BAD_REQUEST);
 		}
 

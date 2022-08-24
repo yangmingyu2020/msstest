@@ -1,5 +1,7 @@
 package com.musinsa.msstest.dto;
 
+import com.musinsa.msstest.entity.Category;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -7,12 +9,12 @@ import lombok.Data;
 @AllArgsConstructor
 public class UpdateProductRequestDto {
 	private Long id;
-	private String category;
+	private Category category;
 	private String brand;
 	private Long price;
 
 	UpdateProductRequestDto() {
 
 	}
-	
+
 }
