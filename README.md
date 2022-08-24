@@ -52,7 +52,7 @@
     ```json
        {
          "id": "ID",
-		  "brand": "브랜드명",
+         "brand": "브랜드명",
          "category": "카테고리명",
          "price": 0
        }
